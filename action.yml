@@ -1,0 +1,30 @@
+name: 'Artifacts2Release'
+description: 'Greet someone'
+inputs:
+  github_token:
+    required: true
+  release_name:
+    required: false
+    default: ${{ github.event.release.tag_name }}
+  artifacts:
+    requred: false
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/download-artifact@v3
+      with:
+        path: github_artifacts
+        name: ${{ inputs.artifacts }}
+    - name: Upload Release Artifacts
+      env:
+          GITHUB_TOKEN: ${{ inputs.github_token }}
+          RELEASE_NAME: ${{ github.event.release.tag_name }}
+      run: |
+        for dir in github_artifacts/*; do
+          dir=${dir#github_artifacts/}
+          cd github_artifacts
+          zip -r ${dir}.zip ${dir}
+          gh release upload ${RELEASE_NAME} ${dir}.zip
+          rm ${dir}.zip
+          cd ..
+        done
