@@ -16,6 +16,7 @@ runs:
         path: github_artifacts
         name: ${{ inputs.artifacts }}
     - name: Upload Release Artifacts
+      shell: bash
       env:
           GITHUB_TOKEN: ${{ inputs.github_token }}
           RELEASE_NAME: ${{ github.event.release.tag_name }}
